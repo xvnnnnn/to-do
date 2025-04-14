@@ -2,12 +2,21 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
-import { getTasks, addTask, updateTask, deleteTask } from "./utils/storage";
+import { getTasks, addTask, updateTask, deleteTask, saveTasks } from "./utils/storage";
 import { Task } from "./types/task";
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  // Handler to clear completed tasks
+  const handleClearCompleted = async () => {
+    const filtered = tasks.filter((t) => !t.completed);
+    await saveTasks(filtered);
+    setTasks(filtered);
+  };
+
+
 
   // Load tasks on mount
   useEffect(() => {
@@ -75,20 +84,33 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-xl bg-white rounded-lg shadow-lg p-6 mt-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">To-Do App</h1>
-        <TaskForm
-          onSubmit={handleSubmit}
-          task={editingTask}
-        />
-        <TaskList
-          tasks={tasks}
-          onToggle={handleToggleTask}
-          onEdit={handleEditTask}
-          onDelete={handleDeleteTask}
-        />
-      </div>
+    <div className="max-w-md mx-auto p-6 bg-gray-100 min-h-screen text-gray-900 relative">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">To-Do App</h1>
+      {/* Task counter and clear completed */}
+      {tasks.length > 0 && (
+        <p className="text-sm text-gray-600 mb-4">
+          Tasks: {tasks.length}
+        </p>
+      )}
+      <TaskForm
+        onSubmit={handleSubmit}
+        task={editingTask}
+      />
+      <TaskList
+        tasks={tasks}
+        onToggle={handleToggleTask}
+        onEdit={handleEditTask}
+        onDelete={handleDeleteTask}
+      />
+      {tasks.some(task => task.completed) && (
+        <button
+          onClick={handleClearCompleted}
+          className="text-sm text-red-600 hover:underline mt-4"
+          type="button"
+        >
+          Clear Completed
+        </button>
+      )}
     </div>
   );
 }

@@ -8,62 +8,79 @@ interface TaskFormProps {
 
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, task = null }) => {
   const [title, setTitle] = useState<string>(task?.title || "");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setTitle(task?.title || "");
-    setError("");
+    setError(null);
   }, [task]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError("Title cannot be empty.");
+      setError("Task title cannot be empty");
       return;
     }
-    if (task) {
-      onSubmit({ ...task, title: title.trim() });
-    } else {
-      onSubmit({ title: title.trim() });
+    setIsLoading(true);
+    try {
+      if (task) {
+        await Promise.resolve(onSubmit({ ...task, title: title.trim() }));
+      } else {
+        await Promise.resolve(onSubmit({ title: title.trim() }));
+      }
+      setTitle("");
+      setError(null);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-    setTitle("");
-    setError("");
   };
 
   return (
-    <form
-      className="flex flex-col sm:flex-row items-stretch gap-3 mb-6 bg-white dark:bg-gray-900 p-4 rounded shadow"
-      onSubmit={handleSubmit}
-      aria-label={task ? "Edit Task" : "Add Task"}
-    >
-      <div className="flex-1 flex flex-col">
-        <label htmlFor="task-title" className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+    <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={handleSubmit}
+        aria-label={task ? "Edit Task" : "Add Task"}
+      >
+        <label
+          htmlFor="task-title"
+          className="text-sm font-medium text-gray-700"
+        >
           Task Title
         </label>
         <input
           id="task-title"
           type="text"
-          className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
+          className="bg-white border border-gray-300 rounded-md p-3 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter task title"
+          placeholder="Enter task"
           aria-invalid={!!error}
           aria-describedby={error ? "task-title-error" : undefined}
+          disabled={isLoading}
         />
         {error && (
-          <span id="task-title-error" className="text-red-500 dark:text-red-400 text-xs mt-1">
+          <p
+            id="task-title-error"
+            className="text-red-500 text-sm"
+            role="alert"
+          >
             {error}
-          </span>
+          </p>
         )}
-      </div>
-      <button
-        type="submit"
-        className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold px-5 py-2 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-        aria-label={task ? "Update Task" : "Add Task"}
-      >
-        {task ? "Update" : "Add"}
-      </button>
-    </form>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white uppercase rounded-lg shadow-sm hover:bg-blue-700 hover:scale-105 transition-transform focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed px-5 py-2 font-semibold"
+          aria-label={task ? "Update Task" : "Add Task"}
+          disabled={isLoading || !title.trim()}
+        >
+          {isLoading ? (task ? "Updating..." : "Adding...") : task ? "Update" : "Add"}
+        </button>
+      </form>
+    </div>
   );
 };
 
