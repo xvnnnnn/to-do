@@ -1,54 +1,97 @@
-# React + TypeScript + Vite
+# To-Do App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple, modern to-do list application built with React, TypeScript, Vite, and Tailwind CSS. Tasks are stored locally in the browser using localforage, providing offline support and persistent data across sessions.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Add, edit, complete, and delete tasks
+- Tasks are persisted locally in the browser (offline support)
+- Responsive and clean UI styled with Tailwind CSS
+- Built with React functional components and TypeScript for type safety
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [React](https://react.dev/) (with Hooks)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) (development/build tooling)
+- [Tailwind CSS](https://tailwindcss.com/) (utility-first CSS framework)
+- [localforage](https://localforage.github.io/localForage/) (async local storage)
+- ESLint (with recommended and type-checked rules)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v16+ recommended)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+
+### Installation
+
+```powershell
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Start the development server with hot module replacement:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```powershell
+npm run dev
 ```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build
+
+To build the app for production:
+
+```powershell
+npm run build
+```
+
+The output will be in the `dist/` directory.
+
+### Lint
+
+To run ESLint:
+
+```powershell
+npm run lint
+```
+
+## Usage
+
+- Add a new task using the input form.
+- Click a task to toggle its completion status.
+- Edit or delete tasks using the corresponding buttons.
+- All tasks are saved in your browser and will persist across reloads.
+
+## Data Model
+
+Each task is represented by the following TypeScript interface:
+
+```ts
+export interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  createdAt: Date;
+}
+```
+
+## Project Structure
+
+```
+src/
+  components/      # TaskForm, TaskItem, TaskList components
+  styles/          # Tailwind/global CSS
+  types/           # Task type definition
+  utils/           # Storage utilities (localforage)
+  App.tsx          # Main app component
+  main.tsx         # Entry point
+public/            # Static assets
+```
+
+## License
+
+MIT
